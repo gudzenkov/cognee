@@ -17,6 +17,11 @@ import mimetypes
 import os
 from typing import Any, Optional
 from urllib.parse import urljoin
+from cognee.tasks.ingestion.config import get_ingestion_config
+
+
+def _should_ignore_name(name: str, ignored_directory_names: set[str]) -> bool:
+    return name.startswith(".") or name in ignored_directory_names
 
 
 def _import_httpx():
@@ -30,6 +35,32 @@ def _import_httpx():
             "The 'httpx' package is required for --api-url mode.  "
             "Install it with:  uv pip install httpx"
         )
+
+
+def _expand_data_items(data_items: list[str]) -> list[str]:
+    """Expand directory arguments so API-dispatch matches local CLI behavior."""
+    expanded_items: list[str] = []
+    ignored_directory_names = get_ingestion_config().get_ignored_directory_names()
+
+    for item in data_items:
+        if os.path.isdir(item):
+            for root, dirs, files in os.walk(item):
+                dirs[:] = [
+                    directory
+                    for directory in dirs
+                    if not _should_ignore_name(directory, ignored_directory_names)
+                ]
+                expanded_items.extend(
+                    os.path.join(root, file_name)
+                    for file_name in files
+                    if not _should_ignore_name(file_name, ignored_directory_names)
+                )
+        elif os.path.exists(item) and _should_ignore_name(os.path.basename(item), ignored_directory_names):
+            continue
+        else:
+            expanded_items.append(item)
+
+    return expanded_items
 
 
 class CogneeApiClient:
@@ -101,7 +132,7 @@ class CogneeApiClient:
         files = []
         opened = []
         try:
-            for item in data_items:
+            for item in _expand_data_items(data_items):
                 if os.path.isfile(item):
                     mime, _ = mimetypes.guess_type(item)
                     fh = open(item, "rb")  # noqa: SIM115

@@ -5,6 +5,11 @@ from typing import List, Union, BinaryIO
 from cognee.tasks.ingestion.exceptions import S3FileSystemNotFoundError
 from cognee.exceptions import CogneeSystemError
 from cognee.infrastructure.files.storage.s3_config import get_s3_config
+from cognee.tasks.ingestion.config import get_ingestion_config
+
+
+def _should_ignore_name(name: str, ignored_directory_names: set[str]) -> bool:
+    return name.startswith(".") or name in ignored_directory_names
 
 
 async def resolve_data_directories(
@@ -26,6 +31,7 @@ async def resolve_data_directories(
 
     resolved_data = []
     s3_config = get_s3_config()
+    ignored_directory_names = get_ingestion_config().get_ignored_directory_names()
 
     fs = None
     if s3_config.aws_access_key_id is not None and s3_config.aws_secret_access_key is not None:
@@ -66,8 +72,19 @@ async def resolve_data_directories(
             elif os.path.isdir(item):  # If it's a directory
                 if include_subdirectories:
                     # Recursively add all files in the directory and subdirectories
-                    for root, _, files in os.walk(item):
-                        resolved_data.extend([os.path.join(root, f) for f in files])
+                    for root, dirs, files in os.walk(item):
+                        dirs[:] = [
+                            directory
+                            for directory in dirs
+                            if not _should_ignore_name(directory, ignored_directory_names)
+                        ]
+                        resolved_data.extend(
+                            [
+                                os.path.join(root, file_name)
+                                for file_name in files
+                                if not _should_ignore_name(file_name, ignored_directory_names)
+                            ]
+                        )
                 else:
                     # Add all files (not subdirectories) in the directory
                     resolved_data.extend(
@@ -75,9 +92,11 @@ async def resolve_data_directories(
                             os.path.join(item, f)
                             for f in os.listdir(item)
                             if os.path.isfile(os.path.join(item, f))
+                            and not _should_ignore_name(f, ignored_directory_names)
                         ]
                     )
-            else:  # If it's a file or text add it directly
+            elif not (os.path.exists(item) and _should_ignore_name(os.path.basename(item), ignored_directory_names)):
+                # If it's a visible file or text add it directly
                 resolved_data.append(item)
         else:  # If it's not a string add it directly
             resolved_data.append(item)

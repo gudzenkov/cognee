@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from cognee.cli.api_client import CogneeApiClient
+from cognee.tasks.ingestion.config import get_ingestion_config
 
 
 class TestCogneeApiClientInit:
@@ -139,3 +140,49 @@ class TestAddFileDetection:
                 assert files_arg[0][1][0] == os.path.basename(path)
         finally:
             os.unlink(path)
+
+    def test_directory_items_expand_to_visible_file_uploads_only(self):
+        with patch.dict(os.environ, {"IGNORED_DIRECTORY_NAMES": ".git,.venv"}):
+            get_ingestion_config.cache_clear()
+            try:
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    top_level_path = os.path.join(temp_dir, "top.txt")
+                    hidden_path = os.path.join(temp_dir, ".DS_Store")
+                    nested_dir = os.path.join(temp_dir, "nested")
+                    nested_path = os.path.join(nested_dir, "child.md")
+                    git_dir = os.path.join(temp_dir, ".git")
+                    git_nested_path = os.path.join(git_dir, "config")
+                    venv_dir = os.path.join(temp_dir, ".venv")
+                    venv_nested_path = os.path.join(venv_dir, "pyvenv.cfg")
+                    os.mkdir(nested_dir)
+                    os.mkdir(git_dir)
+                    os.mkdir(venv_dir)
+
+                    with open(top_level_path, "w", encoding="utf-8") as file_handle:
+                        file_handle.write("top")
+                    with open(hidden_path, "w", encoding="utf-8") as file_handle:
+                        file_handle.write("hidden")
+                    with open(nested_path, "w", encoding="utf-8") as file_handle:
+                        file_handle.write("child")
+                    with open(git_nested_path, "w", encoding="utf-8") as file_handle:
+                        file_handle.write("ignored")
+                    with open(venv_nested_path, "w", encoding="utf-8") as file_handle:
+                        file_handle.write("ignored")
+
+                    with patch("cognee.cli.api_client._import_httpx"):
+                        client = CogneeApiClient("http://x")
+                        mock_resp = MagicMock(status_code=200)
+                        mock_resp.json.return_value = {"status": "ok"}
+                        mock_http_client = MagicMock()
+                        mock_http_client.post.return_value = mock_resp
+                        client._client = mock_http_client
+
+                        client.add([temp_dir], "ds")
+
+                        call_kwargs = mock_http_client.post.call_args
+                        files_arg = call_kwargs.kwargs.get("files") or call_kwargs[1].get("files")
+                        uploaded_names = {file_tuple[1][0] for file_tuple in files_arg}
+
+                        assert uploaded_names == {"top.txt", "child.md"}
+            finally:
+                get_ingestion_config.cache_clear()
