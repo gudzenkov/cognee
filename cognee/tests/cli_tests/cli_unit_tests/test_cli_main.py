@@ -153,6 +153,13 @@ class TestCliMain:
         debug_actions = [action for action in parser._actions if action.dest == "debug"]
         assert len(debug_actions) == 1
 
+    @patch.dict("os.environ", {"COGNEE_API_URL": "http://localhost:8000"})
+    def test_api_url_defaults_from_environment(self):
+        """Test that --api-url falls back to COGNEE_API_URL."""
+        parser, _ = _create_parser()
+        args = parser.parse_args(["datasets", "list"])
+        assert args.api_url == "http://localhost:8000"
+
 
 class TestDebugAction:
     """Test the DebugAction class"""

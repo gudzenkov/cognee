@@ -140,9 +140,10 @@ def _create_parser() -> tuple[argparse.ArgumentParser, Dict[str, SupportsCliComm
     )
     parser.add_argument(
         "--api-url",
-        default=None,
+        default=os.getenv("COGNEE_API_URL"),
         help="Delegate commands to a running Cognee API server (e.g. http://localhost:8000). "
-        "Required for multi-agent / concurrent usage with file-based databases.",
+        "Required for multi-agent / concurrent usage with file-based databases. "
+        "Can also be set via COGNEE_API_URL.",
     )
 
     subparsers = parser.add_subparsers(title="Available commands", dest="command")
