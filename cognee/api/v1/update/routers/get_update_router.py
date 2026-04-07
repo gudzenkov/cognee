@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import WithJsonSchema
 from cognee.shared.logging_utils import get_logger
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.shared.utils import send_telemetry
 from cognee import __version__ as cognee_version
 from cognee.modules.pipelines.models.PipelineRunInfo import (

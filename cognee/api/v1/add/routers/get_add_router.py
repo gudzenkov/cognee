@@ -7,7 +7,7 @@ from typing import List, Optional, Union, Literal, Annotated
 from pydantic import WithJsonSchema
 
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.shared.utils import send_telemetry
 from cognee.modules.pipelines.models import PipelineRunErrored
 from cognee.shared.logging_utils import get_logger

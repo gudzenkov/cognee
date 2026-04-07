@@ -1,23 +1,28 @@
-import os
+import sys
 from typing import Optional
 from fastapi import Depends, HTTPException
 from ..models import User
 from ..get_fastapi_users import get_fastapi_users
 from .get_default_user import get_default_user
 from cognee.shared.logging_utils import get_logger
+from cognee.modules.users.auth_configuration import require_authentication_enabled
 
 
 logger = get_logger("get_authenticated_user")
 
-# Check environment variable to determine authentication requirement
-REQUIRE_AUTHENTICATION = (
-    os.getenv("REQUIRE_AUTHENTICATION", "true").lower() == "true"
-    or os.environ.get("ENABLE_BACKEND_ACCESS_CONTROL", "true").lower() == "true"
-)
+REQUIRE_AUTHENTICATION = require_authentication_enabled()
 
 fastapi_users = get_fastapi_users()
 
-_auth_dependency = fastapi_users.current_user(active=True, optional=not REQUIRE_AUTHENTICATION)
+_auth_dependency = fastapi_users.current_user(active=True, optional=True)
+
+
+def authentication_required() -> bool:
+    client_module = sys.modules.get("cognee.api.client")
+    if client_module is not None and hasattr(client_module, "REQUIRE_AUTHENTICATION"):
+        return client_module.REQUIRE_AUTHENTICATION
+
+    return require_authentication_enabled()
 
 
 async def get_authenticated_user(
@@ -31,6 +36,9 @@ async def get_authenticated_user(
     Always returns a User object for consistent typing.
     """
     if user is None:
+        if authentication_required():
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
         # When authentication is optional and user is None, use default user
         try:
             user = await get_default_user()

@@ -7,7 +7,7 @@ from cognee.api.DTO import InDTO
 from cognee.modules.users.models import User
 from cognee.shared.utils import send_telemetry
 
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.users.api_key.exceptions import ApiKeyCreationError
 from cognee.modules.users.api_key.create_api_key import create_api_key
 from cognee.modules.users.api_key.delete_api_key import delete_api_key

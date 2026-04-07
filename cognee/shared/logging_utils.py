@@ -556,9 +556,18 @@ def setup_logging(log_level=None, name=None):
     # Get a configured logger and log system information
     logger = structlog.get_logger(name if name else __name__)
 
-    logger.warning(
-        "From version 0.5.0 onwards, Cognee will run with multi-user access control mode set to on by default. Data isolation between different users and datasets will be enforced and data created before multi-user access control mode was turned on won't be accessible by default. To disable multi-user access control mode and regain access to old data set the environment variable ENABLE_BACKEND_ACCESS_CONTROL to false before starting Cognee. For more information, please refer to the Cognee documentation."
-    )
+    backend_access_control = os.getenv("ENABLE_BACKEND_ACCESS_CONTROL")
+    if backend_access_control is None:
+        logger.warning(
+            "Backend access control defaults to enabled when supported; set "
+            "ENABLE_BACKEND_ACCESS_CONTROL=false to keep legacy single-user data access."
+        )
+    elif backend_access_control.lower() == "true":
+        logger.warning(
+            "Cognee is running with backend access control enabled. Data isolation between "
+            "different users and datasets will be enforced. Make sure "
+            "REQUIRE_AUTHENTICATION=true is also set for HTTP deployments."
+        )
 
     if log_file_path is not None:
         logger.info(f"Log file created at: {log_file_path}", log_file=log_file_path)

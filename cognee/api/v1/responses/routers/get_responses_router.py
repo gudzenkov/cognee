@@ -21,7 +21,7 @@ from cognee.infrastructure.llm.config import (
     get_llm_config,
 )
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 
 
 def get_responses_router() -> APIRouter:

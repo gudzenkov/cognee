@@ -42,9 +42,10 @@ from cognee.api.v1.users.routers import (
     get_user_id_by_email_router,
 )
 from cognee.api.v1.api_keys.routers import get_api_key_management_router
-from cognee.modules.users.methods.get_authenticated_user import REQUIRE_AUTHENTICATION
+from cognee.modules.users.auth_configuration import require_authentication_enabled
 
 # Ensure application logging is configured for container stdout/stderr
+REQUIRE_AUTHENTICATION = require_authentication_enabled()
 setup_logging()
 logger = get_logger()
 
@@ -127,6 +128,7 @@ def custom_openapi():
     openapi_schema["components"]["securitySchemes"] = {
         "ApiKeyAuth": {"type": "apiKey", "in": "header", "name": "X-Api-Key"},
         "BearerAuth": {"type": "http", "scheme": "bearer"},
+        "CookieAuth": {"type": "apiKey", "in": "cookie", "name": "cogneeauth"},
     }
 
     our_security = [{"BearerAuth": []}, {"ApiKeyAuth": []}]

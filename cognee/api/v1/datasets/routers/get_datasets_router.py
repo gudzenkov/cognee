@@ -19,7 +19,7 @@ from cognee.modules.data.methods import create_dataset, get_datasets_by_name
 from cognee.shared.logging_utils import get_logger
 from cognee.api.v1.exceptions import DataNotFoundError
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.users.permissions.methods import (
     get_all_user_permission_datasets,
     give_permission_on_dataset,

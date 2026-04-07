@@ -27,9 +27,11 @@ class TestAuthFlow:
 
     @pytest.fixture(scope="class")
     def client(self):
-        from cognee.api.client import app
+        import cognee.api.client as client_mod
 
-        with TestClient(app) as client:
+        client_mod.REQUIRE_AUTHENTICATION = True
+
+        with TestClient(client_mod.app) as client:
             yield client
 
     def test_register_login_create_api_key_and_authenticate(self, client):
@@ -112,9 +114,11 @@ class TestHashApiKey:
     @pytest.fixture(scope="class")
     def client(self):
         with patch("cognee.modules.users.api_key.hash_api_key.HASH_API_KEY", True):
-            from cognee.api.client import app
+            import cognee.api.client as client_mod
 
-            with TestClient(app) as client:
+            client_mod.REQUIRE_AUTHENTICATION = True
+
+            with TestClient(client_mod.app) as client:
                 yield client
 
     def test_api_key_is_stored_as_hash(self, client):

@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from cognee.api.DTO import InDTO
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.users.permissions.methods import get_specific_user_permission_datasets
 from cognee.modules.sync.methods import get_running_sync_operations_for_user, get_sync_operation
 from cognee.shared.utils import send_telemetry

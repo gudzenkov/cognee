@@ -4,7 +4,7 @@ from uuid import UUID
 
 from cognee.api.DTO import InDTO
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.shared.logging_utils import get_logger
 from cognee.shared.usage_logger import log_usage
 from cognee.modules.users.methods import (

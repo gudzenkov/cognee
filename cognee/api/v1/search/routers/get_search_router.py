@@ -11,7 +11,7 @@ from cognee.api.DTO import InDTO, OutDTO
 from cognee.modules.users.exceptions.exceptions import PermissionDeniedError, UserNotFoundError
 from cognee.modules.users.models import User
 from cognee.modules.search.operations import get_history
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.shared.utils import send_telemetry
 from cognee.shared.usage_logger import log_usage
 from cognee import __version__ as cognee_version

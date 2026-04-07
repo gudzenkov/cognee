@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from cognee.api.DTO import InDTO, OutDTO
 from typing import Union, Optional, Literal
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from fastapi import Depends
 from cognee.modules.users.models import User
 from cognee.modules.settings.get_settings import LLMConfig, VectorDBConfig

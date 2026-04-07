@@ -46,10 +46,11 @@ with patch("dotenv.load_dotenv"):
 
         @pytest.fixture
         def client(self):
-            from cognee.api.client import app
+            import cognee.api.client as client_mod
 
             """Create a test client."""
-            return TestClient(app)
+            client_mod.REQUIRE_AUTHENTICATION = False
+            return TestClient(client_mod.app)
 
         def test_health_endpoint_no_auth_required(self, client):
             """Test that health endpoint works without authentication."""
@@ -140,9 +141,10 @@ with patch("dotenv.load_dotenv"):
 
         @pytest.fixture
         def client(self):
-            from cognee.api.client import app
+            import cognee.api.client as client_mod
 
-            return TestClient(app)
+            client_mod.REQUIRE_AUTHENTICATION = False
+            return TestClient(client_mod.app)
 
         @pytest.mark.parametrize(
             "endpoint,method",
@@ -217,9 +219,10 @@ with patch("dotenv.load_dotenv"):
 
         @pytest.fixture
         def client(self):
-            from cognee.api.client import app
+            import cognee.api.client as client_mod
 
-            return TestClient(app)
+            client_mod.REQUIRE_AUTHENTICATION = False
+            return TestClient(client_mod.app)
 
         @patch.object(gau_mod, "get_default_user", new_callable=AsyncMock)
         def test_get_default_user_fails(self, mock_get_default, client):

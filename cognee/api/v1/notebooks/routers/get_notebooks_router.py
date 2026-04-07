@@ -11,7 +11,7 @@ from cognee.infrastructure.utils.run_async import run_async
 from cognee.modules.notebooks.models import Notebook, NotebookCell
 from cognee.modules.notebooks.operations import run_in_local_sandbox
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.notebooks.methods import (
     create_notebook,
     delete_notebook,

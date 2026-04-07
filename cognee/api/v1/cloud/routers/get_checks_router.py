@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 
 from cognee.modules.users.models import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.cloud.operations import check_api_key
 from cognee.modules.cloud.exceptions import CloudApiKeyMissingError
 

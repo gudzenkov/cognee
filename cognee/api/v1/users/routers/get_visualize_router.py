@@ -5,7 +5,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from uuid import UUID
 from cognee.shared.logging_utils import get_logger
-from cognee.modules.users.methods import get_authenticated_user, get_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
+from cognee.modules.users.methods import get_user
 from cognee.modules.data.methods import get_authorized_existing_datasets
 from cognee.modules.users.models import User
 

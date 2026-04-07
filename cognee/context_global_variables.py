@@ -13,6 +13,7 @@ from cognee.infrastructure.databases.utils import get_or_create_dataset_database
 from cognee.infrastructure.databases.utils import resolve_dataset_database_connection_info
 from cognee.infrastructure.files.storage.config import file_storage_config
 from cognee.modules.users.methods import get_user
+from cognee.modules.users.auth_configuration import backend_access_control_env_value
 
 # Note: ContextVar allows us to use different graph db configurations in Cognee
 #       for different async tasks, threads and processes
@@ -75,12 +76,12 @@ def multi_user_support_possible():
 
 
 def backend_access_control_enabled():
-    backend_access_control = os.environ.get("ENABLE_BACKEND_ACCESS_CONTROL", None)
+    backend_access_control = backend_access_control_env_value()
     if backend_access_control is None:
         # If backend access control is not defined in environment variables,
-        # enable it by default if graph and vector DBs can support it, otherwise disable it
+        # enable it by default if graph and vector DBs can support it, otherwise disable it.
         return multi_user_support_possible()
-    elif backend_access_control.lower() == "true":
+    if backend_access_control:
         # If enabled, ensure that the current graph and vector DBs can support it
         return multi_user_support_possible()
     return False

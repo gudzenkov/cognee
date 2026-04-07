@@ -3,7 +3,7 @@ from cognee.api.DTO import InDTO
 from pydantic import EmailStr
 
 from cognee.modules.users.models.User import User
-from cognee.modules.users.methods import get_authenticated_user
+from cognee.modules.users.methods.get_authenticated_user import get_authenticated_user
 from cognee.modules.users.methods.get_user_id_by_email import get_user_id_by_email
 
 
