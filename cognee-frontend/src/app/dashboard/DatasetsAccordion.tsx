@@ -47,10 +47,8 @@ export default function DatasetsAccordion({
   } = useDatasets(useCloud);
 
   useEffect(() => {
-    if (datasets.length === 0) {
-      refreshDatasets();
-    }
-  }, [datasets.length, refreshDatasets]);
+    refreshDatasets();
+  }, [refreshDatasets]);
 
   const [openDatasets, openDataset] = useState<Set<string>>(new Set());
 
@@ -102,10 +100,12 @@ export default function DatasetsAccordion({
   };
 
   const [newDatasetError, setNewDatasetError] = useState("");
+  const [datasetActionError, setDatasetActionError] = useState("");
 
   const handleNewDatasetSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setNewDatasetError("");
+    setDatasetActionError("");
 
     const formElements = event.currentTarget;
 
@@ -163,6 +163,7 @@ export default function DatasetsAccordion({
 
   const handleAddFiles = (dataset: Dataset, event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
+    setDatasetActionError("");
 
     if (datasetInProcessing) {
       return;
@@ -177,6 +178,7 @@ export default function DatasetsAccordion({
     const files: File[] = Array.from(event.target.files);
 
     if (!files.length) {
+      setProcessingDataset(null);
       return;
     }
 
@@ -185,9 +187,17 @@ export default function DatasetsAccordion({
         await getDatasetData(dataset.id);
 
         return cognifyDataset(dataset, useCloud)
-          .finally(() => {
-            setProcessingDataset(null);
-          });
+      })
+      .catch((error) => {
+        const message =
+          error?.detail ||
+          error?.message ||
+          "Failed to add files to dataset.";
+
+        setDatasetActionError(message);
+      })
+      .finally(() => {
+        setProcessingDataset(null);
       });
   };
 
@@ -241,6 +251,11 @@ export default function DatasetsAccordion({
           {datasets.length === 0 && (
             <div className="flex flex-row items-baseline-last text-sm text-gray-400 mt-2 px-2">
               <span>No datasets here, add one by clicking +</span>
+            </div>
+          )}
+          {datasetActionError && (
+            <div className="mt-2 px-2 text-sm text-red-600">
+              {datasetActionError}
             </div>
           )}
           {datasets.map((dataset) => {
