@@ -11,7 +11,7 @@ from cognee.tasks.memify.extract_subgraph_chunks import extract_subgraph_chunks
 from cognee.tasks.codingagents.coding_rule_associations import add_rule_associations
 
 # Prerequisites:
-# 1. Copy `.env.template` and rename it to `.env`.
+# 1. Copy `.env.example` and rename it to `.env` for local single-user use.
 # 2. Add your OpenAI API key to the `.env` file in the `LLM_API_KEY` field:
 #    LLM_API_KEY = "your_key_here"
 

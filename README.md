@@ -114,7 +114,7 @@ uv pip install cognee
 import os
 os.environ["LLM_API_KEY"] = "YOUR OPENAI_API_KEY"
 ```
-Alternatively, create a `.env` file using our [template](https://github.com/topoteretes/cognee/blob/main/.env.template).
+Alternatively, create a `.env` file from [`/.env.example`](https://github.com/topoteretes/cognee/blob/main/.env.example) for local single-user use. Use [`/.env.template`](https://github.com/topoteretes/cognee/blob/main/.env.template) for authenticated self-hosted deployments.
 
 To integrate other LLM providers, see our [LLM Provider Documentation](https://docs.cognee.ai/setup-configuration/llm-providers).
 

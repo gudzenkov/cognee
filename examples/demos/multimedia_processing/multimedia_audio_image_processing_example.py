@@ -7,7 +7,7 @@ import cognee
 from cognee.api.v1.search import SearchType
 
 # Prerequisites:
-# 1. Copy `.env.template` and rename it to `.env`.
+# 1. Copy `.env.example` and rename it to `.env` for local single-user use.
 # 2. Add your OpenAI API key to the `.env` file in the `LLM_API_KEY` field:
 #    LLM_API_KEY = "your_key_here"
 

@@ -14,6 +14,9 @@
 
 All platforms require setting `LLM_API_KEY` as a minimum.
 
+Use `.env.template` as the reference for authenticated self-hosted deployments.
+For local single-user development, use `.env.example` instead.
+
 ---
 
 ## Modal (Serverless)
@@ -172,7 +175,7 @@ docker-compose --profile ui up
 
 2. **Set `CORS_ALLOWED_ORIGINS`** to your actual frontend domain instead of `*`.
 
-3. **Enable authentication**: Set `REQUIRE_AUTHENTICATION=True` and configure user management.
+3. **Enable authentication**: Set `REQUIRE_AUTHENTICATION=True` and `ENABLE_BACKEND_ACCESS_CONTROL=True`, then configure user management.
 
 4. **Configure rate limiting**: Set `LLM_RATE_LIMIT_ENABLED=true` to avoid hitting provider limits.
 
