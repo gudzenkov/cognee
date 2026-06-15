@@ -1,6 +1,8 @@
 import asyncio
+import os
 
 import litellm
+from pydantic import BaseModel as _BaseModel
 
 from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.llm.get_llm_client import (
     get_llm_client,
@@ -10,7 +12,11 @@ from cognee.infrastructure.llm.LLMGateway import LLMGateway
 
 logger = get_logger()
 
-CONNECTION_TEST_TIMEOUT_SECONDS = 30
+CONNECTION_TEST_TIMEOUT_SECONDS = int(os.getenv("COGNEE_CONNECTION_TEST_TIMEOUT", "120"))
+
+
+class _LLMTestResponse(_BaseModel):
+    text: str = ""
 
 
 def get_max_chunk_tokens():
@@ -76,13 +82,16 @@ async def test_llm_connection():
     """
     Test connectivity to the LLM endpoint using a simple completion call.
     """
+    if os.getenv("COGNEE_SKIP_CONNECTION_TEST", "").lower() in ("1", "true", "yes"):
+        logger.info("Skipping LLM connection test (COGNEE_SKIP_CONNECTION_TEST=true)")
+        return
     try:
         logger.info("Testing connection to LLM endpoint...")
         await asyncio.wait_for(
             LLMGateway.acreate_structured_output(
                 text_input="test",
                 system_prompt='Respond to me with the following string: "test"',
-                response_model=str,
+                response_model=_LLMTestResponse,
             ),
             timeout=CONNECTION_TEST_TIMEOUT_SECONDS,
         )

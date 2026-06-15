@@ -140,6 +140,21 @@ class OpenAIAdapter(GenericAPIAdapter):
         """
 
         merged_kwargs = {**self.llm_args, **kwargs}
+        # instructor cannot handle plain `str` as response_model — use raw litellm completion
+        if response_model is str:
+            async with llm_rate_limiter_context_manager():
+                response = await litellm.acompletion(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": text_input},
+                    ],
+                    api_key=self.api_key,
+                    api_base=self.endpoint,
+                    api_version=self.api_version,
+                    **{k: v for k, v in merged_kwargs.items() if k not in ("response_model", "max_retries")},
+                )
+                return response.choices[0].message.content
         try:
             async with llm_rate_limiter_context_manager():
                 return await self.aclient.chat.completions.create(
